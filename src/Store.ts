@@ -10,7 +10,7 @@ import { defaultMerger } from "./defaultMerger"
 import { defaultDiffer } from "./defaultDiffer"
 import { defaultMapper } from "./defaultMapper"
 import { StoreListener } from "./StoreListener"
-import cloneDeep from "lodash/cloneDeep"
+import { cloneDeep } from "lodash-es"
 
 export class Store<TValue extends object> implements ObservableStore<TValue> {
   initialValue: TValue

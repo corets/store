@@ -44,7 +44,7 @@ export class Store<TValue extends object> implements ObservableStore<TValue> {
     }
   }
 
-  add(newValue: Partial<TValue>) {
+  put(newValue: Partial<TValue>) {
     const mergedNewValue = this.merger(this.value, cloneDeep(newValue))
 
     this.set(mergedNewValue)

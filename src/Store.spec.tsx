@@ -26,11 +26,11 @@ describe("Store", () => {
     expect(value).toEqual({ foo: "bar" })
   })
 
-  it("adds state", () => {
+  it("puts state", () => {
     const value = { foo: "bar", yolo: "swag" }
     const store = new Store(value)
 
-    store.add({ yolo: "bar" })
+    store.put({ yolo: "bar" })
 
     expect(store.get()).toEqual({ foo: "bar", yolo: "bar" })
     expect(value).toEqual({ foo: "bar", yolo: "swag" })
@@ -38,7 +38,7 @@ describe("Store", () => {
 
   it("resets state to initial state", () => {
     const store = new Store<any>({ foo: "bar" })
-    store.add({ yolo: "swag" })
+    store.put({ yolo: "swag" })
 
     expect(store.get()).toEqual({ foo: "bar", yolo: "swag" })
 
@@ -53,12 +53,12 @@ describe("Store", () => {
 
     expect(store.get()).toEqual({ foo: "bar" })
 
-    store.add({ yolo: "swag" })
+    store.put({ yolo: "swag" })
     store.reset({ bar: "baz" })
 
     expect(store.get()).toEqual({ bar: "baz" })
 
-    store.add({ yolo: "swag" })
+    store.put({ yolo: "swag" })
     store.reset()
 
     expect(store.get()).toEqual({ bar: "baz" })
@@ -69,7 +69,7 @@ describe("Store", () => {
     const value1 = store.get()
     const value2 = store.get()
 
-    store.add({ yolo: "bar" })
+    store.put({ yolo: "bar" })
     expect(value1).toEqual({ foo: "bar", yolo: "swag" })
     expect(value2).toEqual({ foo: "bar", yolo: "swag" })
 

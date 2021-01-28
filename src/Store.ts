@@ -14,14 +14,12 @@ import { StoreListenerWithDifferAndMapper } from "./StoreListenerWithDifferAndMa
 import { cloneDeep } from "lodash-es"
 
 export class Store<TValue extends object> implements ObservableStore<TValue> {
-  initialValue: TValue
   value: TValue
   config: StoreConfig<TValue>
   listeners: StoreListenerWithDifferAndMapper<TValue, any>[]
 
-  constructor(initialValue: TValue, config?: Partial<StoreConfig<TValue>>) {
-    this.initialValue = cloneDeep(initialValue)
-    this.value = cloneDeep(initialValue)
+  constructor(value: TValue, config?: Partial<StoreConfig<TValue>>) {
+    this.value = cloneDeep(value)
     this.config = {
       differ: config?.differ ?? defaultDiffer,
       merger: config?.merger ?? defaultMerger,
@@ -43,14 +41,6 @@ export class Store<TValue extends object> implements ObservableStore<TValue> {
     const mergedNewValue = this.config.merger(this.value, cloneDeep(newValue))
 
     this.set(mergedNewValue)
-  }
-
-  reset(initialValue?: TValue) {
-    if (initialValue) {
-      this.initialValue = cloneDeep(initialValue)
-    }
-
-    this.set(this.initialValue)
   }
 
   listen<TValueMapped extends object = TValue>(

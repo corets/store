@@ -2,7 +2,6 @@ export interface ObservableStore<TValue extends object> {
   get(): TValue
   set(newValue: TValue): void
   put(newValue: Partial<TValue>): void
-  reset(initialValue?: TValue): void
 
   listen<TValueMapped extends object = TValue>(
     callback: StoreListener<TValueMapped>,

@@ -36,34 +36,6 @@ describe("Store", () => {
     expect(value).toEqual({ foo: "bar", yolo: "swag" })
   })
 
-  it("resets to initial value", () => {
-    const store = new Store<any>({ foo: "bar" })
-    store.put({ yolo: "swag" })
-
-    expect(store.get()).toEqual({ foo: "bar", yolo: "swag" })
-
-    store.reset()
-    expect(store.get()).toEqual({ foo: "bar" })
-  })
-
-  it("resets to new initial value", () => {
-    const store = new Store<any>({ foo: "bar" })
-
-    store.reset()
-
-    expect(store.get()).toEqual({ foo: "bar" })
-
-    store.put({ yolo: "swag" })
-    store.reset({ bar: "baz" })
-
-    expect(store.get()).toEqual({ bar: "baz" })
-
-    store.put({ yolo: "swag" })
-    store.reset()
-
-    expect(store.get()).toEqual({ bar: "baz" })
-  })
-
   it("does not mutate previous value", () => {
     const store = new Store({ foo: "bar", yolo: "swag" })
     const value1 = store.get()
@@ -96,7 +68,7 @@ describe("Store", () => {
 
     expect(callback).toHaveBeenCalledTimes(1)
 
-    store.reset()
+    store.set({ foo: "bar" })
 
     expect(callback).toHaveBeenCalledTimes(2)
     expect(callback).toHaveBeenCalledWith({ foo: "bar" })
@@ -126,7 +98,7 @@ describe("Store", () => {
 
     expect(callback).toHaveBeenCalledTimes(2)
 
-    store.reset()
+    store.set({ foo: "bar" })
 
     expect(callback).toHaveBeenCalledTimes(3)
     expect(callback).toHaveBeenCalledWith({ foo: "bar" })
@@ -160,7 +132,7 @@ describe("Store", () => {
     expect(callback).toHaveBeenCalledTimes(3)
     expect(callback).toHaveBeenCalledWith({ foo: "baz" })
 
-    store.reset()
+    store.set({ foo: "bar" })
 
     expect(callback).toHaveBeenCalledTimes(4)
     expect(callback).toHaveBeenCalledWith({ foo: "bar" })

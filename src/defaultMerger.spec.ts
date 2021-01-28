@@ -1,7 +1,7 @@
 import { defaultMerger } from "./defaultMerger"
 
 describe("defaultMerger", () => {
-  it("merges state", () => {
+  it("merges value", () => {
     const obj = { foo: "bar" }
 
     expect(defaultMerger(obj, { foo: "baz" })).toEqual({ foo: "baz" })

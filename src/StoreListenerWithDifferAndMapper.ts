@@ -1,13 +1,16 @@
-import { StoreCallback, StoreDiffer, StoreMapper } from "./types"
+import { StoreListener, StoreDiffer, StoreMapper } from "./types"
 
-export class StoreListener<TValue extends object, TValueMapped extends object> {
-  callback: StoreCallback<TValueMapped>
+export class StoreListenerWithDifferAndMapper<
+  TValue extends object,
+  TValueMapped extends object
+> {
+  callback: StoreListener<TValueMapped>
   mapper: StoreMapper<TValue, TValueMapped>
   differ: StoreDiffer<TValueMapped>
   oldValue: TValueMapped
 
   constructor(
-    callback: StoreCallback<TValueMapped>,
+    callback: StoreListener<TValueMapped>,
     mapper: StoreMapper<TValue, TValueMapped>,
     differ: StoreDiffer<TValueMapped>
   ) {

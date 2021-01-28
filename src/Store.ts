@@ -1,33 +1,32 @@
 import {
   ObservableStore,
-  StoreCallback,
-  StoreCallbackUnsubscribe,
+  StoreListener,
+  StoreListenerUnsubscribe,
   StoreDiffer,
   StoreMapper,
-  StoreMerger,
+  StoreConfig,
+  StoreListenOptions,
 } from "./types"
 import { defaultMerger } from "./defaultMerger"
 import { defaultDiffer } from "./defaultDiffer"
 import { defaultMapper } from "./defaultMapper"
-import { StoreListener } from "./StoreListener"
+import { StoreListenerWithDifferAndMapper } from "./StoreListenerWithDifferAndMapper"
 import { cloneDeep } from "lodash-es"
 
 export class Store<TValue extends object> implements ObservableStore<TValue> {
   initialValue: TValue
   value: TValue
-  merger: StoreMerger<TValue>
-  differ: StoreDiffer<any>
-  listeners: StoreListener<TValue, any>[]
+  config: StoreConfig<TValue>
+  listeners: StoreListenerWithDifferAndMapper<TValue, any>[]
 
-  constructor(
-    initialValue: TValue,
-    merger: StoreMerger<TValue> = defaultMerger,
-    differ: StoreDiffer<TValue> = defaultDiffer
-  ) {
+  constructor(initialValue: TValue, config?: Partial<StoreConfig<TValue>>) {
     this.initialValue = cloneDeep(initialValue)
     this.value = cloneDeep(initialValue)
-    this.differ = differ
-    this.merger = merger
+    this.config = {
+      differ: config?.differ ?? defaultDiffer,
+      merger: config?.merger ?? defaultMerger,
+      mapper: config?.mapper ?? defaultMapper,
+    }
     this.listeners = []
   }
 
@@ -36,16 +35,12 @@ export class Store<TValue extends object> implements ObservableStore<TValue> {
   }
 
   set(newValue: TValue) {
-    const isDifferent = this.differ(this.value, newValue)
-
-    if (isDifferent) {
-      this.value = cloneDeep(newValue)
-      this.notify()
-    }
+    this.value = cloneDeep(newValue)
+    this.notify()
   }
 
   put(newValue: Partial<TValue>) {
-    const mergedNewValue = this.merger(this.value, cloneDeep(newValue))
+    const mergedNewValue = this.config.merger(this.value, cloneDeep(newValue))
 
     this.set(mergedNewValue)
   }
@@ -59,18 +54,19 @@ export class Store<TValue extends object> implements ObservableStore<TValue> {
   }
 
   listen<TValueMapped extends object = TValue>(
-    callback: StoreCallback<TValueMapped>,
-    notifyImmediately: boolean = true,
-    mapper?: StoreMapper<TValue, TValueMapped>
-  ): StoreCallbackUnsubscribe {
-    mapper = mapper
-      ? mapper
-      : (defaultMapper as StoreMapper<TValue, TValueMapped>)
+    callback: StoreListener<TValueMapped>,
+    options?: StoreListenOptions<TValue, TValueMapped>
+  ): StoreListenerUnsubscribe {
+    const mapper =
+      options?.mapper ??
+      (this.config.mapper as StoreMapper<TValue, TValueMapped>)
+    const differ = (options?.differ ?? this.config.differ) as StoreDiffer<any>
+    const notifyImmediately = options?.immediate
 
-    const listener = new StoreListener<TValue, TValueMapped>(
+    const listener = new StoreListenerWithDifferAndMapper<TValue, TValueMapped>(
       callback,
       mapper,
-      this.differ
+      differ
     )
     this.listeners.push(listener)
 

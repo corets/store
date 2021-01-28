@@ -1,13 +1,13 @@
 import { Store } from "./index"
 
 describe("Store", () => {
-  it("creates store with initial state", () => {
+  it("creates store with initial value", () => {
     const store = new Store({ foo: "bar" })
 
     expect(store.get()).toEqual({ foo: "bar" })
   })
 
-  it("returns a copy of state", () => {
+  it("returns a copy of value", () => {
     const obj = { foo: "bar", baz: { yolo: "swag" } }
     const store = new Store(obj)
 
@@ -16,7 +16,7 @@ describe("Store", () => {
     expect(store.get().baz === obj.baz).toBe(false)
   })
 
-  it("sets state", () => {
+  it("sets value", () => {
     const value = { foo: "bar" }
     const store = new Store(value)
 
@@ -26,7 +26,7 @@ describe("Store", () => {
     expect(value).toEqual({ foo: "bar" })
   })
 
-  it("puts state", () => {
+  it("puts value", () => {
     const value = { foo: "bar", yolo: "swag" }
     const store = new Store(value)
 
@@ -36,7 +36,7 @@ describe("Store", () => {
     expect(value).toEqual({ foo: "bar", yolo: "swag" })
   })
 
-  it("resets state to initial state", () => {
+  it("resets to initial value", () => {
     const store = new Store<any>({ foo: "bar" })
     store.put({ yolo: "swag" })
 
@@ -46,7 +46,7 @@ describe("Store", () => {
     expect(store.get()).toEqual({ foo: "bar" })
   })
 
-  it("resets state to new initial state", () => {
+  it("resets to new initial value", () => {
     const store = new Store<any>({ foo: "bar" })
 
     store.reset()
@@ -64,7 +64,7 @@ describe("Store", () => {
     expect(store.get()).toEqual({ bar: "baz" })
   })
 
-  it("does not mutate previous state", () => {
+  it("does not mutate previous value", () => {
     const store = new Store({ foo: "bar", yolo: "swag" })
     const value1 = store.get()
     const value2 = store.get()
@@ -85,6 +85,35 @@ describe("Store", () => {
 
     const removeListener = store.listen(callback)
 
+    expect(callback).toHaveBeenCalledTimes(0)
+
+    store.set({ foo: "baz" })
+
+    expect(callback).toHaveBeenCalledTimes(1)
+    expect(callback).toHaveBeenCalledWith({ foo: "baz" })
+
+    store.set({ foo: "baz" })
+
+    expect(callback).toHaveBeenCalledTimes(1)
+
+    store.reset()
+
+    expect(callback).toHaveBeenCalledTimes(2)
+    expect(callback).toHaveBeenCalledWith({ foo: "bar" })
+
+    removeListener()
+
+    store.set({ yolo: "swag" } as any)
+
+    expect(callback).toHaveBeenCalledTimes(2)
+  })
+
+  it("listens with immediate", () => {
+    const store = new Store({ foo: "bar" })
+    const callback = jest.fn()
+
+    const removeListener = store.listen(callback, { immediate: true })
+
     expect(callback).toHaveBeenCalledTimes(1)
     expect(callback).toHaveBeenCalledWith({ foo: "bar" })
 
@@ -92,6 +121,10 @@ describe("Store", () => {
 
     expect(callback).toHaveBeenCalledTimes(2)
     expect(callback).toHaveBeenCalledWith({ foo: "baz" })
+
+    store.set({ foo: "baz" })
+
+    expect(callback).toHaveBeenCalledTimes(2)
 
     store.reset()
 
@@ -103,5 +136,78 @@ describe("Store", () => {
     store.set({ yolo: "swag" } as any)
 
     expect(callback).toHaveBeenCalledTimes(3)
+  })
+
+  it("listen with a custom differ", () => {
+    const store = new Store({ foo: "bar" })
+    const callback = jest.fn()
+
+    const removeListener = store.listen(callback, {
+      immediate: true,
+      differ: () => true,
+    })
+
+    expect(callback).toHaveBeenCalledTimes(1)
+    expect(callback).toHaveBeenCalledWith({ foo: "bar" })
+
+    store.set({ foo: "baz" })
+
+    expect(callback).toHaveBeenCalledTimes(2)
+    expect(callback).toHaveBeenCalledWith({ foo: "baz" })
+
+    store.set({ foo: "baz" })
+
+    expect(callback).toHaveBeenCalledTimes(3)
+    expect(callback).toHaveBeenCalledWith({ foo: "baz" })
+
+    store.reset()
+
+    expect(callback).toHaveBeenCalledTimes(4)
+    expect(callback).toHaveBeenCalledWith({ foo: "bar" })
+
+    removeListener()
+
+    store.set({ yolo: "swag" } as any)
+
+    expect(callback).toHaveBeenCalledTimes(4)
+  })
+
+  it("diffs", () => {
+    const store = new Store({ foo: "bar" })
+    const callback = jest.fn()
+
+    store.listen(callback, { immediate: true })
+
+    expect(callback).toHaveBeenCalledTimes(1)
+    expect(callback).toHaveBeenCalledWith({ foo: "bar" })
+
+    store.set({ foo: "bar" })
+
+    expect(callback).toHaveBeenCalledTimes(1)
+
+    store.set({ foo: "baz" })
+
+    expect(callback).toHaveBeenCalledTimes(2)
+    expect(callback).toHaveBeenCalledWith({ foo: "baz" })
+  })
+
+  it("diffs with a custom differ", () => {
+    const store = new Store({ foo: "bar" }, { differ: () => true })
+    const callback = jest.fn()
+
+    store.listen(callback, { immediate: true })
+
+    expect(callback).toHaveBeenCalledTimes(1)
+    expect(callback).toHaveBeenCalledWith({ foo: "bar" })
+
+    store.set({ foo: "bar" })
+
+    expect(callback).toHaveBeenCalledTimes(2)
+    expect(callback).toHaveBeenCalledWith({ foo: "bar" })
+
+    store.set({ foo: "baz" })
+
+    expect(callback).toHaveBeenCalledTimes(3)
+    expect(callback).toHaveBeenCalledWith({ foo: "baz" })
   })
 })

@@ -182,4 +182,20 @@ describe("Store", () => {
     expect(callback).toHaveBeenCalledTimes(3)
     expect(callback).toHaveBeenCalledWith({ foo: "baz" })
   })
+
+  it("is usable", () => {
+    const data = new Store({ foo: "bar", yolo: "swag" })
+    const [store, setStore] = data.use()
+
+    expect(data.get()).toEqual({foo: "bar", yolo: "swag"})
+    expect(data.get()).toEqual(store)
+
+    setStore({ foo: "a", yolo: "b"})
+
+    expect(data.get()).toEqual({foo: "a", yolo: "b"})
+
+    setStore(oldValue => ({ ...oldValue, foo: "x"}))
+
+    expect(data.get()).toEqual({foo: "x", yolo: "b"})
+  })
 })

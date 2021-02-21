@@ -5,13 +5,14 @@ import {
   StoreDiffer,
   StoreMapper,
   StoreConfig,
-  StoreListenOptions,
+  StoreListenOptions, StoreSetter,
 } from "./types"
 import { defaultMerger } from "./defaultMerger"
 import { defaultDiffer } from "./defaultDiffer"
 import { defaultMapper } from "./defaultMapper"
 import { StoreListenerWithDifferAndMapper } from "./StoreListenerWithDifferAndMapper"
 import { cloneDeep } from "lodash-es"
+import { createStoreSetter } from "./createStoreSetter"
 
 export class Store<TValue extends object> implements ObservableStore<TValue> {
   value: TValue
@@ -41,6 +42,10 @@ export class Store<TValue extends object> implements ObservableStore<TValue> {
     const mergedNewValue = this.config.merger(this.value, cloneDeep(newValue))
 
     this.set(mergedNewValue)
+  }
+
+  use(): [TValue, StoreSetter<TValue>] {
+    return [this.get(), createStoreSetter(this)]
   }
 
   listen<TValueMapped extends object = TValue>(

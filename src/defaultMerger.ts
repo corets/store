@@ -1,4 +1,4 @@
-import { isObjectLike } from "lodash"
+import isObjectLike from "lodash/isObjectLike"
 import { StoreMerger } from "./types"
 
 export const defaultMerger: StoreMerger<any> = (oldValue, newValue) => {

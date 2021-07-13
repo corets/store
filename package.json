@@ -1,7 +1,7 @@
 {
   "name": "@corets/store",
   "description": "Observable store that can be used inside and outside of React",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Maxim Kott",
   "license": "MIT",
   "main": "./dist/index.js",

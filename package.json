@@ -20,7 +20,7 @@
     "/dist"
   ],
   "repository": "github:corets/store",
-  "homepage": "https://corets.github.io/store",
+  "homepage": "https://docs.corets.io/observables/store",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
